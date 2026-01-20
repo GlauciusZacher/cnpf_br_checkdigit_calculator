@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="text" value="123456780001" id="num"><input type="button" value="Calcular" id="calc">
+    <div id="dig"></div>
+
+    <script>
+        const but = document.getElementById('calc');
+        const num = document.getElementById('num');
+        const dig = document.getElementById('dig');
+
+        but.addEventListener('click', (e) => {
+            dig.innerHTML = calculate(num.value);
+        })
+
+        function calculate(str) {
+            const len = str.length;
+            if (len < 12) return 'Você ingressou ' + len + ' dígitos, deve ingressar pelo menos 12.'; //Less digits than required
+            if (len > 12) return 'Você ingressou ' + len + ' dígitos, deve ingressar no máximo 12.'; //More digits than required
+            if (Number.isNaN(Number(str))) return 'O valor inserido não é um número válido.'; //Not a number
+
+            let num = str.split('');
+            let coe = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]; // Coefficients for calculation
+            let coe1st = [...coe]; //avoiding byref
+            coe1st.shift(); //remove first element for first digit calculation
+            res1 = coefficients(coe1st, num);
+            console.log('First digit: ' + res1); //debug
+            num.push(res1);
+            res2 = coefficients(coe, num);
+            console.log('Second digit: ' + res2); //debug
+            return 'Dígito verificador: ' + res1 + '' + res2;
+        }
+
+        function coefficients(coe, num) {
+            const localnum = [...num]; //Clone num array to avoid modifying it
+            localnum.forEach((n, index, self) => {
+                console.group('Current value: ' + n, ' | Coefficient: ' + coe[index], ' | Index: ' + index, ' | num array: ' + self); //debug
+                self[index] = n * coe[index];
+                console.log('New num array: ' + self); //debug
+                console.groupEnd(); //debug
+            });
+            result = localnum.reduce((acc, curr) => acc + curr, 0);
+            result = (11 - (result % 11));
+            if (result > 9) {
+                return 0;
+            }
+            return result;
+        }
+    </script>
+</body>
+
+</html>
